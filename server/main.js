@@ -6,11 +6,10 @@ var userService = require('./user');
 var visCtrlService = require('./visCtrl');
 var decisionspaceService = require('./decisionspace');
 
-
 var db = dbConnection.db;
 
 var connection = new autobahn.Connection({
-   url: 'ws://127.0.0.1:8080/ws',
+   url: 'ws://127.0.0.1:8082/ws',
    realm: 'realm1'
 });
 
@@ -44,9 +43,10 @@ function dbSetup () {
 function server() {
   console.log("OPEN CONNECTION");
   connection.onopen = function (session) {
+    console.log("CONNECTION OPENED");
     userService.exposeTo(session);
-    decisionspaceService.exposeTo(session);
-    visCtrlService.exposeTo(session);
+    //decisionspaceService.exposeTo(session);
+    //visCtrlService.exposeTo(session);
 
     function decisionspaceRegistration (decisionspaces) {
       var d = new autobahn.when.defer();
