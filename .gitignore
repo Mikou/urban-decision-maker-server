@@ -1,0 +1,9 @@
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+Session.vim
+dbConfig.json
+node_modules/
+npm-debug.log
+
+.crossbar/key.priv
+.crossbar/key.pub
