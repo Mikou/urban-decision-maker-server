@@ -7,6 +7,7 @@ var visCtrlService = require('./visCtrl');
 var decisionspaceService = require('./decisionspace');
 
 var db = dbConnection.db;
+var logger = require('./logger');
 
 var connection = new autobahn.Connection({
    url: 'ws://127.0.0.1:8082/ws',
@@ -41,9 +42,8 @@ function dbSetup () {
 }
 
 function server() {
-  console.log("OPEN CONNECTION");
   connection.onopen = function (session) {
-    console.log("CONNECTION OPENED");
+    logger.log("CONNECTION OPENED");
     userService.exposeTo(session);
     //decisionspaceService.exposeTo(session);
     //visCtrlService.exposeTo(session);
@@ -54,7 +54,7 @@ function server() {
       decisionspaceService.create(db, decisionspace).then( () => {
         d.resolve("decisionspace created");
       }).catch( function (err) {
-        console.log(err);
+        logger.log(err);
         throw new Error(err);
       });
       return d.promise;
@@ -75,22 +75,22 @@ function server() {
       const d = new autobahn.when.defer();
       const visCtrl = visCtrls[0];
       visCtrlService.create(db, visCtrl).then( () => {
-        console.log("done");
         d.resolve("visCtrl created");
       }).catch( (err) => {
-        console.log(err);
+        logger.log(err);
         throw new Error(err);
       });
       return d.promise;
     }
 
-    function visCtrlList () {
+    // produce a list of visualization controls
+    function visCtrls () {
       var d = new autobahn.when.defer();
       console.log("GET VISCTRLS")
       visCtrlService.read(db).then( (data) => {
         d.resolve(data);
       }).catch( function (err) {
-        console.log(err);
+        logger.log(err)
         throw new Error(err);
       });
       return d.promise;
@@ -99,37 +99,37 @@ function server() {
 
     session.register('udm.backend.decisionspaceRegistration', decisionspaceRegistration).then(
        function (reg) {
-          console.log("procedure loginUser() registered");
+          logger.log("procedure loginUser() registered");
        },
        function (err) {
-          console.log("failed to register procedure: " + err);
+          logger.log("failed to register procedure: " + err);
        }
     );
 
     session.register('udm.backend.decisionspaceList', decisionspaceList).then(
        function (reg) {
-          console.log("procedure loginUser() registered");
+          logger.log("procedure loginUser() registered");
        },
        function (err) {
-          console.log("failed to register procedure: " + err);
+          logger.log("failed to register procedure: " + err);
        }
     );
 
     session.register('udm.backend.visCtrlRegistration', visCtrlRegistration).then(
        function (reg) {
-          console.log("procedure loginUser() registered");
+          logger.log("procedure loginUser() registered");
        },
        function (err) {
-          console.log("failed to register procedure: " + err);
+          logger.log("failed to register procedure: " + err);
        }
     );
 
-    session.register('udm.backend.visCtrlList', visCtrlList).then(
+    session.register('udm.backend.visCtrls', visCtrls).then(
        function (reg) {
-          console.log("procedure loginUser() registered");
+          logger.log("procedure loginUser() registered");
        },
        function (err) {
-          console.log("failed to register procedure: " + err);
+          logger.log("failed to register procedure: " + err);
        }
     );
   };

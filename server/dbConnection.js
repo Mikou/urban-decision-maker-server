@@ -5,5 +5,6 @@ var cn = "postgres://"+dbConfig.user+":"+dbConfig.password+"@"+dbConfig.host+":"
 var db = pgp(cn);
 
 module.exports = {
+  pgp: pgp,
   db:db
 }

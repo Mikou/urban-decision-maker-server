@@ -1,6 +1,7 @@
 const autobahn = require('autobahn');
 const dbConnection = require('./dbConnection');
 const db_prefix = 'udm';
+const pgp = dbConnection.pgp;
 const db = dbConnection.db;
 const User = {
   username: "",
@@ -53,8 +54,18 @@ const userLogin = function(candidateUser) {
   read(candidateUser[0]["username"]).then( (users) => {
     d.resolve(users);
   }).catch( (err) => {
-    console.log(err);
-  })
+    if(err instanceof pgp.errors.QueryResultError) {
+      d.reject({
+        type: 'error',
+        message: 'Sorry but user with name ' + candidateUser[0].username + ' does not exists.'
+      });
+    } else {
+      d.reject({
+        type: 'error',
+        message: 'Unhandled error when trying to login.'
+      });
+    }
+  });
   return d.promise;
 }
 
