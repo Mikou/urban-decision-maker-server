@@ -3,12 +3,14 @@ var autobahn = require('autobahn');
 var pgp = require("pg-promise")(/*options*/);
 var dbConnection = require('./dbConnection');
 var userService = require('./user');
+var widgetService = require('./widget');
 var visCtrlService = require('./visCtrl');
 var decisionspaceService = require('./decisionspace');
 
 var db = dbConnection.db;
 var logger = require('./logger');
-
+const dummyDataService = require('./dummyData');
+const debug=true;
 var connection = new autobahn.Connection({
    url: 'ws://127.0.0.1:8082/ws',
    realm: 'realm1'
@@ -34,7 +36,15 @@ function dbSetup () {
         deleted: false
       });
     }).then(function () {
-      resolve();
+
+      if(debug) {
+        dummyDataService.create().then( () => {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+
     }).catch(function (err) {
       console.log(err);
     });
@@ -45,13 +55,14 @@ function server() {
   connection.onopen = function (session) {
     logger.log("CONNECTION OPENED");
     userService.exposeTo(session);
+    widgetService.exposeTo(session);
     //decisionspaceService.exposeTo(session);
     //visCtrlService.exposeTo(session);
 
     function decisionspaceRegistration (decisionspaces) {
       var d = new autobahn.when.defer();
       let decisionspace = decisionspaces[0];
-      decisionspaceService.create(db, decisionspace).then( () => {
+      decisionspaceService.create(decisionspace).then( () => {
         d.resolve("decisionspace created");
       }).catch( function (err) {
         logger.log(err);
@@ -84,13 +95,12 @@ function server() {
     }
 
     // produce a list of visualization controls
-    function visCtrls () {
+    function getVisCtrls () {
+      console.log("-get controls ----------------------------------")
       var d = new autobahn.when.defer();
-      console.log("GET VISCTRLS")
-      visCtrlService.read(db).then( (data) => {
+      visCtrlService.getAll().then( (data) => {
         d.resolve(data);
       }).catch( function (err) {
-        logger.log(err)
         throw new Error(err);
       });
       return d.promise;
@@ -124,7 +134,7 @@ function server() {
        }
     );
 
-    session.register('udm.backend.visCtrls', visCtrls).then(
+    session.register('udm.backend.getVisCtrls', getVisCtrls).then(
        function (reg) {
           logger.log("procedure loginUser() registered");
        },

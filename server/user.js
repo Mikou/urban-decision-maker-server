@@ -34,12 +34,23 @@ const rolevalidation = function (r) {
 }
 
 const create = function (user) {
-  if (!rolevalidation(user.roles))
-    throw new Error("invalid role");
-  if(user['deleted'] == undefined) user.deleted = false;
-  user.password = hashPwd(user.password);
-  return db.none('INSERT INTO '+db_prefix+'_user(username, email, password, firstname, lastname, roles, deleted) VALUES (${username}, ${email}, ${password}, ${firstname}, ${lastname}, ${roles}, ${deleted})', user);
+  return new Promise ((resolve, reject) => {
+    if (!rolevalidation(user.roles))
+      throw new Error("invalid role");
+    if(user['deleted'] == undefined) user.deleted = false;
+    user.password = hashPwd(user.password);
+    const query = `INSERT INTO `+db_prefix+`_user(username, email, password, firstname, lastname, roles, deleted) 
+      VALUES (\${username}, \${email}, \${password}, \${firstname}, \${lastname}, \${roles}, \${deleted}) RETURNING id`;
+    db.one(query, user).then( (result) => {
+      user.id = result.id;
+      resolve(user);
+    }).catch( (err) => {
+      reject(err); 
+    })
+
+  });
 }
+
 
 const read = function (username) {
   if(username) {
