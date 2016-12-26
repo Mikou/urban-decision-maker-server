@@ -28,7 +28,7 @@ const dummyUser = {
   email: "dumber@udm.dk",
   firstname: "Jim",
   lastname: "Carrey",
-  roles: ['admin', 'planner'].toString(),
+  roles: ['admin', 'planner'],
   deleted: false
 };
 const dummyDecisionspace1 = {
@@ -77,6 +77,7 @@ const create = function () {
       dummyDecisionspace1.userid = user.id;
       dummyDecisionspace2.userid = user.id;
       const promises = [];
+      console.log("WAITING");
       promises.push(decisionspaceService.create(dummyDecisionspace1));
       promises.push(decisionspaceService.create(dummyDecisionspace2));
 

@@ -1,7 +1,8 @@
 var pjson = require(__dirname + '/../package.json');
-var dbConfig = require(__dirname + "/.." + pjson.dbConfig);
+//var dbConfig = require(__dirname + "/.." + pjson.dbConfig);
 var pgp = require("pg-promise")(/*options*/);
-var cn = "postgres://"+dbConfig.user+":"+dbConfig.password+"@"+dbConfig.host+":"+dbConfig.port+"/"+dbConfig.database;
+//var cn = "postgres://"+dbConfig.user+":"+dbConfig.password+"@"+dbConfig.host+":"+dbConfig.port+"/"+dbConfig.database;
+var cn = process.env.DATABASE_URL;
 var db = pgp(cn);
 
 module.exports = {

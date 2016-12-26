@@ -3,27 +3,6 @@ const dbConnection = require('./dbConnection');
 const db_prefix = 'udm';
 const pgp = dbConnection.pgp;
 const db = dbConnection.db;
-const User = {
-  username: "",
-  password: "",
-  firstname: "",
-  lastname: "",
-  roles: [],
-  deleted: false
-}
-
-const userschema = `
-  CREATE TABLE ` + db_prefix + `_user (
-    id SERIAL   PRIMARY KEY,
-    username    varchar (50)  NOT NULL,
-    firstname   varchar (50)  NOT NULL,
-    lastname    varchar (50)  NOT NULL,
-    email       varchar (50)  NOT NULL,
-    password    char    (128) NOT NULL,
-    roles       varchar (50)  NOT NULL,
-    deleted     boolean       NOT NULL DEFAULT FALSE
-  );
-`
 
 const hashPwd = function (pwd) {
   return pwd + "_HASHED";
@@ -39,9 +18,24 @@ const create = function (user) {
       throw new Error("invalid role");
     if(user['deleted'] == undefined) user.deleted = false;
     user.password = hashPwd(user.password);
-    const query = `INSERT INTO `+db_prefix+`_user(username, email, password, firstname, lastname, roles, deleted) 
-      VALUES (\${username}, \${email}, \${password}, \${firstname}, \${lastname}, \${roles}, \${deleted}) RETURNING id`;
-    db.one(query, user).then( (result) => {
+    const query = `
+      INSERT INTO udm_user(username, email, password, firstname, lastname, roles, deleted) 
+        VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7)
+      RETURNING id
+    `;
+
+    db.one({
+      text:query,
+      values: [
+        user.username, 
+        user.email,
+        user.password,
+        user.firstname,
+        user.lastname,
+        user.roles.toString(),
+        false
+      ]
+    }).then( (result) => {
       user.id = result.id;
       resolve(user);
     }).catch( (err) => {
@@ -51,24 +45,16 @@ const create = function (user) {
   });
 }
 
-
-const read = function (username) {
-  if(username) {
-    return db.one('SELECT * FROM '+db_prefix+'_user WHERE username=\''+username+'\'');
-  } else {
-    return db.any('SELECT * FROM '+db_prefix+'_user');
-  }
-}
-
-const userLogin = function(candidateUser) {
+const userLogin = function(args) {
   const d = new autobahn.when.defer();
-  read(candidateUser[0]["username"]).then( (users) => {
-    d.resolve(users);
+  const username = args[0]['username'];
+  db.one('SELECT * FROM '+db_prefix+'_user WHERE username=\''+username+'\'').then( (user) => {
+    d.resolve(user);
   }).catch( (err) => {
     if(err instanceof pgp.errors.QueryResultError) {
       d.reject({
         type: 'error',
-        message: 'Sorry but user with name ' + candidateUser[0].username + ' does not exists.'
+        message: 'Sorry but user with name ' + username + ' does not exists.'
       });
     } else {
       d.reject({
@@ -82,15 +68,15 @@ const userLogin = function(candidateUser) {
 
 const getUsers = function () {
   var d = new autobahn.when.defer();
-  read().then( (users) => {
+  db.any('SELECT * FROM '+db_prefix+'_user').then( () => {
     d.resolve(users);
   });
   return d.promise;
 }
 
-const userRegistration = function (users) {
+const userRegistration = function (args) {
   let d = new autobahn.when.defer();
-  const user = users[0];
+  const user = args[0];
   create(user).then( () => {
     d.resolve("user created");
   }).catch( function (err) {
@@ -98,6 +84,43 @@ const userRegistration = function (users) {
   });
   return d.promise;
 }
+
+const _searchUsersWithPrefix = function (prefix) {
+  const query = "SELECT * FROM udm_user WHERE username LIKE $1";
+
+  return new Promise( (resolve, reject) => {
+    db.any({
+      text: query,
+      values: [prefix + '%']
+    }).then( (users) => {
+      resolve(users); 
+    }).catch( (err) => {
+      console.log(err);
+      reject(err); 
+    });
+  });
+}
+
+/* public autobahn methods --------------------------------------------------*/
+const searchUsersWithPrefix = function (args) {
+  const d = new autobahn.when.defer();
+  const prefix = args[0];
+
+  _searchUsersWithPrefix(prefix).then( users => {
+    d.resolve(users); 
+  }).catch( err => {
+    d.reject("could not fetch the users. something went wrong"); 
+  })
+
+  return d.promise;
+}
+
+const inviteUserWithUsername = function (args) {
+  const d = new autobahn.when.defer();
+  d.reject("NOT IMPLEMENTED YET");
+  return d.promise;
+}
+/*---------------------------------------------------------------------------*/
 
 const publish = function (session) {
   session.register('udm.backend.getUsers', getUsers).then(
@@ -126,11 +149,28 @@ const publish = function (session) {
         console.log("failed to register procedure: " + err);
      }
   );
+
+  session.register('udm.backend.searchUsersWithPrefix', searchUsersWithPrefix).then(
+     function (reg) {
+        console.log("procedure createUser() registered");
+     },
+     function (err) {
+        console.log("failed to register procedure: " + err);
+     }
+  );
+  session.register('udm.backend.inviteUserWithUsername', inviteUserWithUsername).then(
+     function (reg) {
+        console.log("procedure inviteUserWithUsername() registered");
+     },
+     function (err) {
+        console.log("failed to register procedure: " + err);
+     }
+     
+  );
+
 }
 
 module.exports = {
-  userschema: userschema,
   create: create,
-  read: read,
   exposeTo: publish
 }

@@ -61,6 +61,47 @@ function getWidgets(decisionspaceId) {
   return d.promise;
 }
 
+function createWidget(args) {
+  const decisionspaceId = args[0];
+  const widget = args[1];
+  //[{"cptType":"visualization","visualization":{"url":"http://dummyvis.com/#2"},"name":"control 2","gravity":1,"type":"widget","id":1}]
+  const d = new autobahn.when.defer();
+  let type = null;
+  if(widget.cptType == 'visualization') {
+    type = 'visualization';
+  } else {
+    console.log("reject");
+    d.reject("widget type not yet supported");
+    return;
+  }
+  console.log(widget);
+
+  const query = `
+    INSERT INTO udm_widget (title, decisionspace_id, gravity, type)
+    VALUES (\$1, \$2, \$3, \$4)
+    RETURNING ID
+  `;
+  db.one({
+    text: query,
+    values: [widget.name, decisionspaceId, widget.gravity, type]
+  }).then( (res) => {
+    if(type === 'visualization') {
+      widget.visualization.name = widget.name; // visualization should probably not have a "name" field
+      visualizationService.create(res.id, widget.visualization).then( (visualization) => {
+        widget.visualization = visualization;
+        d.resolve(widget);
+      }).catch( (err) => {
+        console.log("err------>", err);
+        d.reject(err); 
+      })
+    }
+  }).catch((err) => {
+    console.log("err------>", err);
+    d.reject("err" + err); 
+  });
+  return d.promise;
+}
+
 const insertDummyData = function () {
   
 }
@@ -73,8 +114,16 @@ const publish = function (session) {
      function (err) {
         console.log("failed to register procedure: " + err);
      }
-
   );
+  session.register('udm.backend.createWidget', createWidget).then(
+     function (reg) {
+        console.log("procedure createWidget() registered");
+     },
+     function (err) {
+        console.log("failed to register procedure: " + err);
+     }
+  );
+
 }
 
 module.exports = {
