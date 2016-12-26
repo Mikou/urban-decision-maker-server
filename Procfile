@@ -1,1 +1,1 @@
-web: crossbar start
+worker: crossbar start
