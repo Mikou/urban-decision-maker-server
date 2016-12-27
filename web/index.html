@@ -1,0 +1,107 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <title>UDM</title>
+  </head>
+  <body>
+    <h1>UDM test page</h1>
+    <button id="toggle" onclick="send = !send">Start/Stop</button>
+    <button id="clear" onclick="clearLog()">clear logs</button>
+    <p>logs:</p>
+    <ul id="out"></ul>
+    <script>AUTOBAHN_DEBUG = true;</script>
+    <script src="http://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz"></script>
+
+    <script>
+       // the URL of the WAMP Router (Crossbar.io)
+       //
+       var wsuri;
+       var send = false;
+       if (document.location.origin == "file://") {
+          wsuri = "ws://127.0.0.1:8080/ws";
+
+       } else {
+          wsuri = (document.location.protocol === "http:" ? "ws:" : "wss:") + "//" +
+                      document.location.host + "/ws";
+       }
+
+
+       // the WAMP connection to the Router
+       //
+       var connection = new autobahn.Connection({
+          url: wsuri,
+          realm: "realm1"
+       });
+
+
+       // timers
+       //
+       var t1, t2;
+
+       var ping = function (args) {
+         var message = args[0];
+         var $li = document.createElement("li");
+         $li.appendChild(document.createTextNode(message));
+         document.getElementById("out").appendChild($li);
+       }
+
+       var clearLog = function () {
+          document.getElementById("out").innerHTML = "";
+       }
+
+
+       // fired when connection is established and session attached
+       //
+       connection.onopen = function (session, details) {
+
+          console.log("Connected");
+
+          session.subscribe('udm.frontend.test', ping).then(
+            function (sub)  {
+              console.log("subscribe to topic");
+            },
+            function (err) {
+              console.log("failed to subscribe to topic", err);
+            }
+          );
+
+          t1 = setInterval(function () {
+            if(send == true) {
+              session.call('udm.backend.test', ['Hi backend']).then(
+                function (res) {
+                  console.log("test() result:", res);
+                },
+                function (err) {
+                  console.log("test() err:", err);
+                }
+              );
+              }
+          }, 1000);
+
+       };
+
+
+       // fired when connection was lost (or could not be established)
+       //
+       connection.onclose = function (reason, details) {
+          console.log("Connection lost: " + reason);
+          if (t1) {
+             clearInterval(t1);
+             t1 = null;
+          }
+          if (t2) {
+             clearInterval(t2);
+             t2 = null;
+          }
+       }
+
+
+       // now actually open the connection
+       //
+       connection.open();
+
+    </script>
+
+
+  </body>
+</html>
