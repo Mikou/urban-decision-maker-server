@@ -13,6 +13,7 @@ var logger = require('./logger');
 const dummyDataService = require('./dummyData');
 const debug=true;
 const port = process.env.PORT;
+console.log("port:", port);
 var connection = new autobahn.Connection({
    url: 'ws://127.0.0.1:'+port+'/ws',
    realm: 'realm1'
