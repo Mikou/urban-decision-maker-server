@@ -1,11 +1,12 @@
 let globalSession = null;
+const autobahn = require('autobahn');
 
 const ping = function (args) {
+  const d = new autobahn.when.defer();
   const session = globalSession;
+  d.resolve("ping reveived at " + new Date());
   console.log(args);
-  setTimeout( () => {
-    session.publish('udm.frontend.test', ['Hi frontend']);
-  },1000);
+  return d.promise;
 }
 
 const publish = function (session) {

@@ -38,38 +38,22 @@
        //
        var t1, t2;
 
-       var ping = function (args) {
-         var message = args[0];
-         var $li = document.createElement("li");
-         $li.appendChild(document.createTextNode(message));
-         document.getElementById("out").appendChild($li);
-       }
-
        var clearLog = function () {
           document.getElementById("out").innerHTML = "";
        }
-
 
        // fired when connection is established and session attached
        //
        connection.onopen = function (session, details) {
 
-          console.log("Connected");
-
-          session.subscribe('udm.frontend.test', ping).then(
-            function (sub)  {
-              console.log("subscribe to topic");
-            },
-            function (err) {
-              console.log("failed to subscribe to topic", err);
-            }
-          );
-
           t1 = setInterval(function () {
             if(send == true) {
-              session.call('udm.backend.test', ['Hi backend']).then(
+              session.call('udm.backend.test', ['Frontend test, ' + new Date()]).then(
                 function (res) {
                   console.log("test() result:", res);
+                  var $li = document.createElement("li");
+                  $li.appendChild(document.createTextNode(res));
+                  document.getElementById("out").appendChild($li);
                 },
                 function (err) {
                   console.log("test() err:", err);
