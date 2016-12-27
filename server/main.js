@@ -12,8 +12,9 @@ var db = dbConnection.db;
 var logger = require('./logger');
 const dummyDataService = require('./dummyData');
 const debug=true;
+const port = process.env.PORT;
 var connection = new autobahn.Connection({
-   url: 'ws://127.0.0.1:8082/ws',
+   url: 'ws://127.0.0.1:'+port+'/ws',
    realm: 'realm1'
 });
 
