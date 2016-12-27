@@ -6,6 +6,7 @@ var userService = require('./user');
 var widgetService = require('./widget');
 var visCtrlService = require('./visCtrl');
 var decisionspaceService = require('./decisionspace');
+var testService = require('./test');
 
 var db = dbConnection.db;
 var logger = require('./logger');
@@ -56,9 +57,8 @@ function server() {
     logger.log("CONNECTION OPENED");
     userService.exposeTo(session);
     widgetService.exposeTo(session);
-    console.log(1);
     decisionspaceService.exposeTo(session);
-    console.log(2);
+    testService.exposeTo(session);
     //visCtrlService.exposeTo(session);
 
 
@@ -85,9 +85,10 @@ function server() {
       return d.promise;
     }
 
+
     session.register('udm.backend.visCtrlRegistration', visCtrlRegistration).then(
        function (reg) {
-          logger.log("procedure loginUser() registered");
+          logger.log("procedure visCtrlRegistration() registered");
        },
        function (err) {
           logger.log("failed to register procedure: " + err);
@@ -96,7 +97,7 @@ function server() {
 
     session.register('udm.backend.getVisCtrls', getVisCtrls).then(
        function (reg) {
-          logger.log("procedure loginUser() registered");
+          logger.log("procedure getVisCtrls() registered");
        },
        function (err) {
           logger.log("failed to register procedure: " + err);
