@@ -12,6 +12,18 @@ const rolevalidation = function (r) {
     return true;//(r == "admin" || r == "member")
 }
 
+const createRole = function (name) {
+  return new Promise( (resolve, reject) => {
+    const query = 'INSERT INTO udm_role (name) VALUES ($1) RETURNING id';
+    db.one({
+      text:query,
+      values: [name]
+    }).then( (id) => {
+      resolve(id);
+    });
+  });
+}
+
 const create = function (user) {
   return new Promise ((resolve, reject) => {
     if (!rolevalidation(user.roles))
@@ -32,7 +44,7 @@ const create = function (user) {
         user.password,
         user.firstname,
         user.lastname,
-        user.roles.toString(),
+        user.roles,
         false
       ]
     }).then( (result) => {
@@ -49,6 +61,8 @@ const userLogin = function(args) {
   const d = new autobahn.when.defer();
   const username = args[0]['username'];
   db.one('SELECT * FROM '+db_prefix+'_user WHERE username=\''+username+'\'').then( (user) => {
+    user.roles = user.roles.split(",");
+    console.log("->", user);
     d.resolve(user);
   }).catch( (err) => {
     if(err instanceof pgp.errors.QueryResultError) {
@@ -172,5 +186,6 @@ const publish = function (session) {
 
 module.exports = {
   create: create,
+  createRole: createRole,
   exposeTo: publish
 }

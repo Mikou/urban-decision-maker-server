@@ -34,7 +34,7 @@ const create = function (visCtrl) {
 
 const getAll = function () {
   const query = `
-    SELECT id, name, url, user_id AS userid, 'visItem' AS type FROM udm_visctrl JOIN udm_visctrl_user ON udm_visctrl.id = udm_visctrl_user.visctrl_id;
+    SELECT id, name, url, user_id AS userid, 'VISCTRL' AS type FROM udm_visctrl JOIN udm_visctrl_user ON udm_visctrl.id = udm_visctrl_user.visctrl_id;
   `
   return new Promise( (resolve, reject) => {
     db.any(query).then((visCtrls) => {

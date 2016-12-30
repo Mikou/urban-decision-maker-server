@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS udm_vis_user;
 DROP TABLE IF EXISTS udm_visctrl_user;
 --DROP TABLE IF EXISTS udm_vis_decisionspace;
 DROP TABLE IF EXISTS udm_decisionspace_widget;
--- simple tables
+-- simple tables:
 DROP TABLE IF EXISTS udm_user;
 DROP TABLE IF EXISTS udm_visctrl;
 DROP TABLE IF EXISTS udm_visualization;
@@ -25,7 +25,8 @@ CREATE TABLE udm_user (
 CREATE TABLE udm_decisionspace (
   id SERIAL   PRIMARY KEY,
   name        varchar (50)  NOT NULL,
-  description varchar (50)
+  description varchar (50),
+  published   boolean       NOT NULL DEFAULT false
 );
 CREATE TABLE udm_visctrl (
   id SERIAL   PRIMARY KEY,
