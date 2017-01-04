@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var autobahn = require('autobahn');
 
 var pgp = require("pg-promise")(/*options*/);
@@ -33,11 +35,10 @@ function dbSetup () {
         email: "m@m.dk",
         firstname: "bob",
         lastname: "salomon",
-        roles: ["admin", "domainexpert"].toString(),
+        roles: ["admin", "domainexpert"],
         deleted: false
       });
     }).then(function () {
-
       if(debug) {
         dummyDataService.create().then( () => {
           resolve();

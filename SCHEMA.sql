@@ -1,6 +1,7 @@
 -- REMOVE OLD TABLES
 -- m:m
 DROP TABLE IF EXISTS udm_decisionspace_user;
+DROP TABLE IF EXISTS udm_permission_decisionspace_user;
 DROP TABLE IF EXISTS udm_vis_user;
 DROP TABLE IF EXISTS udm_visctrl_user;
 --DROP TABLE IF EXISTS udm_vis_decisionspace;
@@ -52,6 +53,11 @@ CREATE TABLE udm_visualization (
 );
 -- m:m
 CREATE TABLE udm_decisionspace_user (
+  user_id           integer  REFERENCES udm_user (id)          NOT NULL,
+  decisionspace_id  integer  REFERENCES udm_decisionspace (id) NOT NULL,
+  PRIMARY KEY(user_id, decisionspace_id)
+);
+CREATE TABLE udm_permission_decisionspace_user (
   user_id           integer  REFERENCES udm_user (id)          NOT NULL,
   decisionspace_id  integer  REFERENCES udm_decisionspace (id) NOT NULL,
   PRIMARY KEY(user_id, decisionspace_id)

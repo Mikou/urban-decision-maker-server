@@ -25,20 +25,22 @@ const dummyUser = {
   id: null,
   username: "dumber",
   password: "n0t_s0_s3cr3t",
-  email: "dumber@udm.dk",
+  email: process.env.PRIVATE_EMAIL,
   firstname: "Jim",
   lastname: "Carrey",
   roles: ['admin', 'planner'],
   deleted: false
 };
 const dummyDecisionspace1 = {
-  name:"dummy decision space 1",
+  name:"dummy decision space 1 (private)",
   description:"This is my first dummy decision space",
+  published: false,
   userid:null
 };
 const dummyDecisionspace2 = {
-  name:"dummy decision space 2",
+  name:"dummy decision space 2 (public)",
   description:"This is my second dummy decision space",
+  published: true,
   userid:null
 };
 const dummyVisualizationWidget = {
@@ -77,7 +79,6 @@ const create = function () {
       dummyDecisionspace1.userid = user.id;
       dummyDecisionspace2.userid = user.id;
       const promises = [];
-      console.log("WAITING");
       promises.push(decisionspaceService.create(dummyDecisionspace1));
       promises.push(decisionspaceService.create(dummyDecisionspace2));
 
@@ -99,17 +100,21 @@ const create = function () {
       promises.push(widgetService.create(decisionspaces[0].id, dummyVisualizationWidget));
       promises.push(widgetService.create(decisionspaces[1].id, dummyVisualizationWidget2));
       promises.push(widgetService.create(decisionspaces[1].id, dummyVisualizationWidget3));
+      
+      promises.push(decisionspaceService.authorize(dummyUser.id, dummyDecisionspace1.id));
 
       return new Promise( (resolve, reject) => {
         Promise.all(promises).then( (widgets) => {
           resolve(widgets);
         }).catch( (err) => {
+          console.log(err);
           reject(err);
         });
       });
     }).then( (widgets) => {
       resolve();
     }).catch( (err) => {
+      console.log(err);
       reject(err);
     });
   });

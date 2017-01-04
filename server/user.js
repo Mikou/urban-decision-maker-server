@@ -44,7 +44,7 @@ const create = function (user) {
         user.password,
         user.firstname,
         user.lastname,
-        user.roles,
+        user.roles.toString(),
         false
       ]
     }).then( (result) => {
@@ -57,12 +57,32 @@ const create = function (user) {
   });
 }
 
+const getByUsername = function (username) {
+  return new Promise ((resolve, reject) => {
+    const query = 'SELECT * FROM udm_user WHERE username=$1';
+    db.one({
+      text:query,
+      values:[username]
+    }).then((user) => {
+      user.roles = user.roles.split(',');
+      resolve(user);
+    }).catch( (err) => {
+      reject("Username not valid");
+    });
+  });
+}
+
 const userLogin = function(args) {
   const d = new autobahn.when.defer();
   const username = args[0]['username'];
-  db.one('SELECT * FROM '+db_prefix+'_user WHERE username=\''+username+'\'').then( (user) => {
+  const query = `
+    SELECT * FROM `+db_prefix+`_user WHERE username=\$1
+    `;
+  db.one({
+    text:query,
+    values: [username]
+  }).then( (user) => {
     user.roles = user.roles.split(",");
-    console.log("->", user);
     d.resolve(user);
   }).catch( (err) => {
     if(err instanceof pgp.errors.QueryResultError) {
@@ -129,11 +149,6 @@ const searchUsersWithPrefix = function (args) {
   return d.promise;
 }
 
-const inviteUserWithUsername = function (args) {
-  const d = new autobahn.when.defer();
-  d.reject("NOT IMPLEMENTED YET");
-  return d.promise;
-}
 /*---------------------------------------------------------------------------*/
 
 const publish = function (session) {
@@ -145,7 +160,6 @@ const publish = function (session) {
         console.log("failed to register procedure: " + err);
      }
   );
-
   session.register('udm.backend.userLogin', userLogin).then(
      function (reg) {
         console.log("procedure loginUser() registered");
@@ -154,7 +168,6 @@ const publish = function (session) {
         console.log("failed to register procedure: " + err);
      }
   );
-
   session.register('udm.backend.userRegistration', userRegistration).then(
      function (reg) {
         console.log("procedure createUser() registered");
@@ -163,7 +176,6 @@ const publish = function (session) {
         console.log("failed to register procedure: " + err);
      }
   );
-
   session.register('udm.backend.searchUsersWithPrefix', searchUsersWithPrefix).then(
      function (reg) {
         console.log("procedure createUser() registered");
@@ -172,20 +184,11 @@ const publish = function (session) {
         console.log("failed to register procedure: " + err);
      }
   );
-  session.register('udm.backend.inviteUserWithUsername', inviteUserWithUsername).then(
-     function (reg) {
-        console.log("procedure inviteUserWithUsername() registered");
-     },
-     function (err) {
-        console.log("failed to register procedure: " + err);
-     }
-     
-  );
-
 }
 
 module.exports = {
   create: create,
+  getByUsername: getByUsername,
   createRole: createRole,
   exposeTo: publish
 }
