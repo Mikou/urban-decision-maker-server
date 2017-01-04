@@ -111,10 +111,12 @@ const getUsers = function () {
 const userRegistration = function (args) {
   let d = new autobahn.when.defer();
   const user = args[0];
+  console.log("registration", user);
   create(user).then( () => {
-    d.resolve("user created");
+    d.resolve(user);
   }).catch( function (err) {
-    throw new Error(err);
+    console.log(err);
+    d.reject(err);
   });
   return d.promise;
 }

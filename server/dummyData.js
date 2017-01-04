@@ -21,6 +21,17 @@ const dummyVisCtrls = [
   }
 ];
 
+const dummyUser_paul = {
+  id: null,
+  username: "paul",
+  password: "n0t_s0_s3cr3t",
+  email: process.env.PRIVATE_EMAIL,
+  firstname: "Paul",
+  lastname: "Snatch",
+  roles: ['planner'],
+  deleted: false
+};
+
 const dummyUser = {
   id: null,
   username: "dumber",
@@ -71,22 +82,19 @@ const dummyVisualizationWidget3 = {
   }
 };
 
-
-
 const create = function () {
+  const createDummyUser1 = userService.create(dummyUser);
+  const createDummyUser2 = userService.create(dummyUser_paul);
   return new Promise( (resolve, reject) => {
-    userService.create(dummyUser).then( (user) => {
-      dummyDecisionspace1.userid = user.id;
-      dummyDecisionspace2.userid = user.id;
+    Promise.all([createDummyUser1, createDummyUser2]).then((users) => {
+      dummyDecisionspace1.userid = users[0].id;
+      dummyDecisionspace2.userid = users[0].id;
       const promises = [];
       promises.push(decisionspaceService.create(dummyDecisionspace1));
       promises.push(decisionspaceService.create(dummyDecisionspace2));
-
       for(let i=0; i<dummyVisCtrls.length; i++) {
-        dummyVisCtrls[i].userId = user.id;
-        promises.push(visCtrlService.create(dummyVisCtrls[i]));
+        promises.push(visCtrlService.create(dummyVisCtrls[i], users[0].id));
       }
-
       return new Promise( (resolve, reject) => {
         Promise.all(promises).then( (decisionspaces) => {
           resolve(decisionspaces);
@@ -94,15 +102,13 @@ const create = function () {
           reject(err);
         });
       });
+   
     }).then( (decisionspaces) => {
-
       const promises = [];
       promises.push(widgetService.create(decisionspaces[0].id, dummyVisualizationWidget));
       promises.push(widgetService.create(decisionspaces[1].id, dummyVisualizationWidget2));
       promises.push(widgetService.create(decisionspaces[1].id, dummyVisualizationWidget3));
-      
       promises.push(decisionspaceService.authorize(dummyUser.id, dummyDecisionspace1.id));
-
       return new Promise( (resolve, reject) => {
         Promise.all(promises).then( (widgets) => {
           resolve(widgets);

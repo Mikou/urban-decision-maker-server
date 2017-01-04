@@ -77,26 +77,99 @@ const _create = function (decisionspace) {
 }
 
 const _getDecisionspaces = function(user) {
-  let filter = "";
-  if(!user) {
-    filter = ' WHERE published = true';
-  }
-  let query = `
-    SELECT id, name, description, published, user_id AS userid 
-    FROM udm_decisionspace 
-    JOIN udm_decisionspace_user 
-    ON udm_decisionspace.id = udm_decisionspace_user.decisionspace_id
-  `;
+  let query = '';
+  if(user) {
+    if(user.roles.some(r => r == 'admin' || r == 'domainexpert')) {
+      query =  `
+        SELECT id, name, description, published, user_id AS userid 
+        FROM udm_decisionspace 
+        JOIN udm_decisionspace_user 
+        ON udm_decisionspace.id = udm_decisionspace_user.decisionspace_id;
+      `;
 
-  query = query + filter;
+      return new Promise( (resolve, reject) => {
+        db.any(query)
+          .then( (data) => {
+            resolve(data);
+          }).catch(err => {
+            console.log(err);
+            reject(err);
+          })
+      });
 
-  return new Promise( (resolve, reject) => {
-    db.any(query).then( (data) => {
-      resolve(data);
-    }).catch( function (err) {
-      console.log(err);
-      reject('could not fetch the list of decisionspaces');
+    } else if(user.roles.some(r => r == 'planner')) {
+      query =  `
+        SELECT id, name, description, published, user_id AS userid 
+          FROM udm_decisionspace
+          JOIN udm_decisionspace_user
+          ON udm_decisionspace.id = udm_decisionspace_user.decisionspace_id
+        WHERE published=true 
+          OR udm_decisionspace.id=(
+            SELECT decisionspace_id 
+              FROM udm_permission_decisionspace_user
+            WHERE udm_permission_decisionspace_user.user_id=\$1
+          )
+      `;
+
+       return new Promise( (resolve, reject) => {
+         db.any({
+           text: query,
+           values: [user.id]
+         })
+         .then( (data) => {
+           resolve(data);
+         }).catch(err => {
+           console.log(err);
+           reject(err);
+         })
+       });
+
+    }
+  } else {
+    query =  `
+      SELECT id, name, description, published, user_id AS userid 
+      FROM udm_decisionspace 
+      JOIN udm_decisionspace_user 
+      ON udm_decisionspace.id = udm_decisionspace_user.decisionspace_id WHERE published = true
+    `;
+    return new Promise( (resolve, reject) => {
+      db.any(query)
+        .then( (data) => {
+          resolve(data);
+        }).catch(err => {
+          console.log(err);
+          reject(err);
+        })
     });
+  }
+}
+
+const _checkPermissions = function (userId, decisionspaceId) {
+  return new Promise( (resolve, reject) => {
+    // check if public
+    db.any({
+      text: 'SELECT * FROM udm_decisionspace WHERE id=$1 AND published=true',
+      values: [decisionspaceId]
+    }).then( data => {
+      if(data.length > 0) {
+        resolve(true);
+        return;
+      } else {
+        // check user specific permission (if not public)
+        db.any({
+          text: 'SELECT * FROM udm_permission_decisionspace_user WHERE user_id=$1 AND decisionspace_id=$2',
+          values: [userId, decisionspaceId]
+        }).then( (data) => {
+          resolve(data.length > 0);
+        }).catch( err => {
+          console.log(err);
+          reject(err) 
+        });
+      }
+    }).catch( err => {
+      console.log(err);
+      reject(err);
+    })
   });
 }
 
@@ -142,29 +215,48 @@ const inviteUserWithUsername = function (args) {
   const p1 = _getDecisionspaceById(decisionspaceId);
   const p2 = userService.getByUsername(username);
 
+  let decisionspace, invitedUser;
+
   Promise.all([p1, p2]).then( (data) => {
-    const decisionspace = data[0];
-    const invitedUser = data[1];
-    console.log("-> USER INVITED", data);
-    /*postmark.send({
-      "From": "mjes@itu.dk",
-      "To": invitedUser.email,
-      "Subject": "Invitation",
-      "TextBody": "You have been invited into the decision space:\"" + decisionspace.name + "\".\n Click the following link to join: " + href,
-      "Tag": "invitation"
-    }, function(error, success) {
-      if(error) {
-          console.error("Unable to send via postmark: " + error.message);
-         d.reject(error.message);
-         return;
-      }
+    decisionspace = data[0];
+    invitedUser = data[1];
+    return _authorize(invitedUser.id, decisionspace.id);
+    
+  }).then( () => {
+
+   if(invitedUser.email !== 'test@udm.dk') {
+      postmark.send({
+        "From": "mjes@itu.dk",
+        "To": invitedUser.email,
+        "Subject": "Invitation",
+        "TextBody": "You have been invited into the decision space:\"" + decisionspace.name + "\".\n Click the following link to join: " + href,
+        "Tag": "invitation"
+      }, function(error, success) {
+        if(error) {
+            console.error("Unable to send via postmark: " + error.message);
+           d.reject(error.message);
+           return;
+        }
+        d.resolve(invitedUser);
+        console.info("Sent to postmark for delivery")
+      });
+    } else {
       d.resolve(invitedUser);
-      console.info("Sent to postmark for delivery")
-    });*/
-    d.resolve(invitedUser);
+    } 
   })
   return d.promise;
 }
+
+const checkPermissions = function (args) {
+  const d = new autobahn.when.defer();
+  const userId = args[0];
+  const decisionspaceId = args[1];
+  _checkPermissions(userId, decisionspaceId).then( (hasAccess) => {
+    d.resolve(hasAccess);
+  }).catch( err => d.reject(err) );
+  return d.promise;
+}
+
 /*---------------------------------------------------------------------------*/
 
 const publish = function (session) {
@@ -200,6 +292,14 @@ const publish = function (session) {
         console.log("failed to register procedure: " + err);
      }
   );
+  session.register('udm.backend.checkPermissions', checkPermissions).then(
+    function (reg) {
+        console.log("procedure checkPermissions() registered");
+    },
+    function (err) {
+        console.log("failed to register procedure: " + err);
+    }    
+  )
 }
 
 module.exports = {

@@ -61,7 +61,7 @@ function server() {
     widgetService.exposeTo(session);
     decisionspaceService.exposeTo(session);
     testService.exposeTo(session);
-    //visCtrlService.exposeTo(session);
+    visCtrlService.exposeTo(session);
 
 
     function visCtrlRegistration(visCtrls) {
