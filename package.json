@@ -2,10 +2,12 @@
   "name": "udm_server",
   "version": "1.0.0",
   "description": "Server implementation for the urban decision maker (udm)",
-  "main": "server/main.js",
-  "dbConfig": "/dbConfig.json",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests --recursive"
   },
   "keywords": [
     "urban decision maker",
@@ -14,9 +16,12 @@
   "author": "Michael Jespersen",
   "license": "MIT",
   "dependencies": {
-    "autobahn": "^0.9.5",
-    "dotenv": "^2.0.0",
-    "pg-promise": "^5.3.4",
-    "postmark": "^1.3.1"
+    "autobahn": "^0.11.2",
+    "bluebird": "^3.4.7",
+    "dotenv": "^4.0.0",
+    "pg-promise": "^5.5.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0"
   }
 }

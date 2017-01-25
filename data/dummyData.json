@@ -1,0 +1,54 @@
+{
+  "title": "urban decision maker",
+  "description": "minimal setup",
+  "users": [
+    {
+      "id": null,
+      "username": "testuser",
+      "firstname": "John",
+      "lastname": "Johnson",
+      "password": "s3cr3t",
+      "email": "m@m.udm",
+      "roles": ["domainexpert", "planner"]
+    }
+  ],
+  "visctrls": [],
+  "visfeatures": [],
+  "decisionspaces": [
+    {
+      "id": null,
+      "title": "my first decision space",
+      "description": "my first decision space",
+      "published": true,
+      "author": 1,
+      "bundles": [
+        {
+          "title": "my first bundle",
+          "description": "my first bundle",
+          "author": 1,
+          "visualization": {
+            "url": "http://dummyvis.com/#1"
+          }
+        }
+      ]
+    },
+    {
+      "id": null,
+      "title": "my second decision space",
+      "description": "my second decision space",
+      "published": true,
+      "author": 1,
+      "bundles": [
+        {
+          "title": "my first bundle",
+          "description": "my first bundle",
+          "author": 1,
+          "visualization": {
+            "url": "http://dummyvis.com/#1"
+          }
+        }
+      ]
+    }
+
+  ]
+}

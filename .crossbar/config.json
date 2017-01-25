@@ -61,13 +61,13 @@
             "type": "guest",
             "executable": "node",
             "arguments": [
-                "main.js"
+                "index.js"
             ],
             "options": {
-                "workdir": "../server",
+                "workdir": "../",
                 "watch": {
                     "directories": [
-                        "../server"
+                        "../"
                     ],
                     "action": "restart"
                 }
