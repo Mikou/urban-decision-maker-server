@@ -46,9 +46,12 @@ module.exports = {
   },
   decisionspace: {
     add:      open('decisionspace/add.sql'),
+    canAccess:open('decisionspace/canAccess.sql'),
     grant:    open('decisionspace/grant.sql'),
+    isPublic: open('decisionspace/isPublic.sql'),
     remove:   open('decisionspace/delete.sql'),
     retrieve: open('decisionspace/retrieve.sql'),
+    retrieveAll: open('decisionspace/retrieveAll.sql'),
     retrievefull: open('decisionspace/retrievefull.sql'),
     revoke:   open('decisionspace/revoke.sql'),
     update:   open('decisionspace/update.sql')
@@ -62,7 +65,9 @@ module.exports = {
   user: {
     add:      open('user/add.sql'),
     remove:   open('user/delete.sql'),
-    retrieve: open('user/retrieve.sql'),
+    retrieveById: open('user/retrieveById.sql'),
+    retrieveByUsername: open('user/retrieveByUsername.sql'),
+    retrieveByUsernamePrefix: open('user/retrieveByUsernamePrefix.sql'),
     update:   open('user/update.sql')
   },
   visualization: {

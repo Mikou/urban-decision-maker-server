@@ -9,7 +9,7 @@ const repos = {
   user:          require('./repos/user'),
   util:          require('./repos/util'),
   visCtrl:       require('./repos/visCtrl'),
-  featurectrl:       require('./repos/featurectrl'),
+  featurectrl:   require('./repos/featurectrl'),
   visualization: require('./repos/visualization'),
 };
 

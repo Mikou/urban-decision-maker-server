@@ -1,54 +1,85 @@
 {
-  "title": "urban decision maker",
-  "description": "minimal setup",
-  "users": [
-    {
-      "id": null,
-      "username": "testuser",
-      "firstname": "John",
-      "lastname": "Johnson",
-      "password": "s3cr3t",
-      "email": "m@m.udm",
-      "roles": ["domainexpert", "planner"]
-    }
-  ],
-  "visctrls": [],
-  "visfeatures": [],
-  "decisionspaces": [
-    {
-      "id": null,
-      "title": "my first decision space",
-      "description": "my first decision space",
-      "published": true,
-      "author": 1,
-      "bundles": [
-        {
-          "title": "my first bundle",
-          "description": "my first bundle",
-          "author": 1,
-          "visualization": {
-            "url": "http://dummyvis.com/#1"
+  "udm": {
+    "title": "urban decision maker",
+    "description": "minimal setup",
+    "users": [
+      {
+        "id": null,
+        "username": "testuser",
+        "firstname": "John",
+        "lastname": "Johnson",
+        "password": "s3cr3t",
+        "email": "m@m.udm",
+        "roles": ["domainexpert", "planner"]
+      }
+    ],
+    "visctrls": [
+      {
+        "id": null,
+        "title": "my first visualization control",
+        "description": "my first visualization control",
+        "author": 1,
+        "url": "http://dummyvis.com/#1"
+      }
+    ],
+    "featurectrls": [
+      {
+        "id": null,
+        "title": "comment form",
+        "description": "Allow users to post a comment",
+        "author": 1,
+        "componentType": "COMMENT_FORM"
+      },
+      {
+        "id": null,
+        "title": "comment archive",
+        "description": "Allow users to see posted comments",
+        "author": 1,
+        "componentType": "COMMENT_ARCHIVE"
+      }
+    ],
+    "decisionspaces": [
+      {
+        "id": null,
+        "title": "my first decision space",
+        "description": "my first decision space",
+        "published": true,
+        "author": 1,
+        "bundles": [
+          {
+            "title": "my first bundle",
+            "description": "my first bundle",
+            "published": true,
+            "author": 1,
+            "visualization": {
+              "url": "http://www.w3schools.com"
+            },
+            "features": [
+              { "componentType": "COMMENT_FORM" }
+            ]
           }
-        }
-      ]
-    },
-    {
-      "id": null,
-      "title": "my second decision space",
-      "description": "my second decision space",
-      "published": true,
-      "author": 1,
-      "bundles": [
-        {
-          "title": "my first bundle",
-          "description": "my first bundle",
-          "author": 1,
-          "visualization": {
-            "url": "http://dummyvis.com/#1"
+        ]
+      },
+      {
+        "id": null,
+        "title": "my second decision space",
+        "description": "my second decision space",
+        "published": false,
+        "author": 1,
+        "bundles": [
+          {
+            "title": "my first bundle",
+            "description": "my first bundle",
+            "published": true,
+            "author": 1,
+            "visualization": {
+              "url": "http://dummyvis.com/#1"
+            },
+            "features": []
           }
-        }
-      ]
-    }
+        ]
+      }
 
-  ]
+    ]
+  }
 }

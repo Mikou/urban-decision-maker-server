@@ -9,7 +9,6 @@ DROP TABLE IF EXISTS udm_vis_user;
 DROP TABLE IF EXISTS udm_visctrl_user;
 DROP TABLE IF EXISTS udm_featurectrl_user;
 DROP TABLE IF EXISTS udm_decisionspace_bundle;
-DROP TABLE IF EXISTS udm_feature_bundle;
 DROP TABLE IF EXISTS udm_bundle_user;
 -- simple tables:
 DROP TABLE IF EXISTS udm_user;
@@ -85,7 +84,7 @@ CREATE TABLE udm_feature (
   bundle_id         integer,
   --title           varchar (50)   NOT NULL,
   --description     varchar (256),
-  component_type    varchar (32)   NOT NULL,
+  component_type    varchar (32)  NOT NULL,
   gravity           integer       NOT NULL,
   --FOREIGN KEY       (decisionspace_id) REFERENCES udm_decisionspace(id),
   FOREIGN KEY       (bundle_id)    REFERENCES udm_bundle(id)
@@ -136,9 +135,4 @@ CREATE TABLE udm_user_comment (
   comment_id        integer  REFERENCES udm_comment (id)       NOT NULL,
   user_id           integer  REFERENCES udm_user (id)          NOT NULL,
   PRIMARY KEY(user_id, comment_id)
-);
-CREATE TABLE udm_feature_bundle (
-  feature_id        integer  REFERENCES udm_feature (id)       NOT NULL,
-  bundle_id         integer  REFERENCES udm_bundle (id)        NOT NULL,
-  PRIMARY KEY(feature_id, bundle_id)
 );

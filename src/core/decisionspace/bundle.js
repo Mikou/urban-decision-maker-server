@@ -5,7 +5,9 @@ module.exports = (_db, _udm, _decisionspace, decisionspaceId) => {
     retrieveAll: () => repo.retrieveAll(decisionspaceId),
     withId: bundleId => {
       return {
-        addFeature: feature => repo.addFeature(decisionspaceId, bundleId, feature),
+        addFeature: featureCtrl => {
+          return repo.addFeature(decisionspaceId, bundleId, featureCtrl)
+        },
         remove: () => repo.remove(bundleId),
         update: decisionspace => null
       };

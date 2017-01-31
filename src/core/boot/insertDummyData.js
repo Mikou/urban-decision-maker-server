@@ -1,6 +1,10 @@
 module.exports = (udm, data) => {
   return new Promise( (resolve, reject) => {
     
+    const insertUdm = udm => new Promise( (resolve, reject) => {
+      resolve();
+    })
+
     const insertUsers = users => {
       return new Promise( (resolve, reject) => {
         if (!users || users.length < 1) {
@@ -14,14 +18,45 @@ module.exports = (udm, data) => {
       });
     };
 
-    const insertBundles = bundles => {
+    const insertFeatures = (decisionspaceId, bundleId, features) => {
+      return new Promise( (resolve, reject) => {
+        if (!features || features.length < 1) {
+          resolve();
+        } else {
+          const promises = features.map(
+            featurectrl => {
+              return udm.decisionspace.withId(decisionspaceId)
+                 .bundle.withId(bundleId)
+                 .addFeature(featurectrl)
+            }
+          );
+          Promise.all(promises)
+            .then( data => {
+              resolve() 
+            })
+            .catch( err => reject(err) );
+        }
+      });
+    }
+
+    const insertBundles = (decisionspaceId, bundles) => {
       return new Promise( (resolve, reject) => {
         if (!bundles || bundles.length < 1) {
           resolve();
         } else {
-          const promises = bundles.map( bundle => udm.bundle.create(bundle) );
+          const promises = bundles.map( 
+              bundle => udm.decisionspace.withId(decisionspaceId).bundle.create(bundle) );
           Promise.all(promises)
-            .then(() => resolve())
+            .then(bundleIds => {
+              const promises = bundles.map(
+                bundle => {
+                  return insertFeatures(decisionspaceId, bundle.id, bundle.features) 
+                });
+
+              Promise.all(promises)
+                .then( () => resolve() )
+                .catch( err => reject(err) );
+            })
             .catch( err => reject(err));
         }
       });
@@ -35,10 +70,11 @@ module.exports = (udm, data) => {
           const promises = decisionspaces.map( decisionspace => udm.decisionspace.create(decisionspace) );
           Promise.all(promises)
             .then(decisionspaces => {
-              const promises = decisionspaces.map( decisionspace => insertBundles(decisionspace.bundle ))
+              const promises = decisionspaces.map( 
+                  decisionspace => insertBundles(decisionspace.id, decisionspace.bundles ) );
               Promise.all(promises)
                 .then( () => resolve())
-                .catch( err => {console.log(err);reject(err)});
+                .catch( err => reject(err));
             })
             .catch( err => reject(err));
         }
@@ -49,7 +85,7 @@ module.exports = (udm, data) => {
         if (!visctrls || visctrls.length < 1) {
           resolve();
         } else {
-          const promises = visctrls.map( visctrl => udm.decisionspace.create(visctrl));
+          const promises = visctrls.map( visctrl => udm.decisionspace.visctrl.create(visctrl));
           Promise.all(promises)
             .then(() => resolve())
             .catch( err => reject(err));
@@ -61,18 +97,18 @@ module.exports = (udm, data) => {
         if (!featurectrls || featurectrls < 1) {
           resolve();
         } else {
-          const promises = featurectrls.map( featurectrl => udm.decisionspace.create(featurectrl));
+          const promises = featurectrls.map( featurectrl => udm.decisionspace.featurectrl.create(featurectrl));
           Promise.all(promises)
             .then(() => resolve())
             .catch( err => reject(err));
         }
       });
     };
-
-    insertUsers(data.users)
-      .then( () => insertDecisionspaces(data.decisionspaces) )
-      .then( () => insertVisctrls(data.visctrls) )
-      .then( () => insertFeaturectrls(data.featurectrls) )
+      insertUdm(data.udm)
+      .then( () => insertUsers(data.udm.users) )
+      .then( () => insertDecisionspaces(data.udm.decisionspaces) )
+      .then( () => insertVisctrls(data.udm.visctrls) )
+      .then( () => insertFeaturectrls(data.udm.featurectrls) )
       .then( () => resolve() )
       .catch( err => reject(err))
 

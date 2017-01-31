@@ -3,16 +3,16 @@ const expect = chai.expect;
 const udm = require('../src/core');
 const dummyData = require('../data/dummyData.json');
 
-before( done => {
-  udm.boot({
-    dummyData: dummyData
-  })
-    .then( done )
-    .catch( err => console.log(err));
-});
-
 describe('udm.decisionspace', () => {
-  const Decisionspace = {
+  before( done => {
+    udm.boot({
+      dummyData: dummyData
+    })
+      .then( done )
+      .catch( err => console.log(err));
+  });
+
+  const dummyDecisionspace = {
     id:null,
     title: "test decision space",
     description: "this is a simple text string with extra information",
@@ -21,16 +21,44 @@ describe('udm.decisionspace', () => {
   };
 
   it('should create a decisionspace', done => {
-    udm.decisionspace.create(Decisionspace)
-      .then( () => done() )
+    udm.decisionspace.create(dummyDecisionspace)
+      .then( decisionspace => {
+        expect(decisionspace).to.be.an('object');
+        done();
+      })
+      .catch( err => console.log(err) );
   });
-  it('should retrieve a decisionspace', done => {
+  it('should retrieve a decisionspace (without it\'s nested content)', done => {
     udm.decisionspace.withId(1).retrieve()
-      .then( () => done() )
+      .then( decisionspace => {
+        expect(decisionspace).to.be.an('object');
+        expect(decisionspace).to.not.have.property('bundles');
+        done();
+      })
+  });
+  it('should retrieve a decisionspace (along with it\'s nested content)', done => {
+    udm.decisionspace.withId(1).retrievefull()
+      .then( decisionspace => {
+        expect(decisionspace).to.be.an('object');
+        expect(decisionspace).to.have.property('bundles');
+        done();
+      })
+  });
+  it('should retrieve all decisionspaces', done => {
+    udm.decisionspace.retrieve()
+      .then( decisionspaces => {
+        expect(decisionspaces).to.be.an('array');
+        done();
+      })
+      .catch(err => console.log(err));
   });
   it('should remove a decisionspace', done => {
     udm.decisionspace.withId(1).remove()
-      .then( id => done() )
+      .then( id => {
+        expect(id).to.be.a('number');
+        done();
+      })
+      .catch(err => console.log(err));
   });
   it('should not be possible to retrieve a removed decisionspace', done => {
     udm.decisionspace.withId(1).retrieve()
@@ -47,8 +75,12 @@ describe('udm.decisionspace', () => {
     .catch(err => done() );
   });
   it('should create a decisionspace', done => {
-    udm.decisionspace.create(Decisionspace)
-      .then( () => done() )
+    udm.decisionspace.create(dummyDecisionspace)
+      .then( decisionspace => {
+        expect(decisionspace).to.be.an('object');
+        done() 
+      })
+      .catch(err => console.log(err));
   });
   it('should update a decisionspace', done => {
     udm.decisionspace.withId(2).update({
@@ -58,17 +90,28 @@ describe('udm.decisionspace', () => {
       published: false,
       author:1
     })
-      .then( () => done() )
+      .then( decisionspace => {
+        expect(decisionspace).to.be.an('object');
+        done() 
+      })
       .catch(err => console.error(err) );
   });
   it('should grant access for a user in a decisionspace', done => {
     udm.decisionspace.withId(2).grant(1)
-      .then( () => done() )
+      .then( id => {
+        expect(id).to.be.a('number');
+        done() 
+      })
       .catch(err => console.error(err) );
   });
   it('should hold that user 1 can now access decisionspace 2', done => {
     udm.decisionspace.withId(2).canAccess(1)
-      .then( () => done() )
+      .then( canAccess => {
+        expect(canAccess).to.be.a('boolean');
+        expect(canAccess).to.be.true;
+
+        done() 
+      })
       .catch(err => console.error(err));
   });
   it('should revoke access for a user in a decisionspace', done => {
@@ -98,23 +141,6 @@ describe('udm.decisionspace', () => {
     }))
     .then( () => done())
     .catch(err => console.error(err) );
-  });
-  it('should add 2 features in a bundle', done => {
-    udm.decisionspace.withId(2).bundle.withId(1).addFeature({
-      componentType: 'COMMENT_FORM'
-    })
-    .then( () => udm.decisionspace.withId(2).bundle.withId(1).addFeature({
-      componentType: 'COMMENT_ARCHIVE'
-    }))
-    .then( () => done())
-    .catch( err => console.error(err) );
-  });
-  it('should retrieve a list of bundles within a given decisionspace', done => {
-    udm.decisionspace.withId(2).bundle.retrieveAll()
-      .then( bundles => {
-        done();
-      })
-      .catch( err => console.log(err));
   });
   it('should retrieve a full decisionspace (bundle, visualizations and features included)', done => {
     udm.decisionspace.withId(2).retrievefull()

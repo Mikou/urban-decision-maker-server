@@ -1,48 +1,40 @@
 module.exports = (prefixes, session, autobahn, _udm) => new Promise((resolve, reject) => {
+  const repo = _udm.decisionspace.featurectrl;
   const create = args => {
     const d = autobahn.when.defer();
-    const user = args[0];
-    _udm.user.create(user)
-      .then( user => d.resolve(user))
+    const featurectrl = args[0];
+    repo.create(featurectrl)
+      .then( featurectrl => d.resolve(featurectrl))
       .catch( err => d.reject(err) );
-
     return d.promise;
   };
   const remove = args => {
     const d = autobahn.when.defer();
-    const userId = args[0];
-    _udm.user.remove(userId)
-      .then( userId => d.resolve(userId))
+    const featurectrlId = args[0];
+    repo.remove(featurectrlId)
+      .then( featurectrlId => d.resolve(featurectrlId))
       .catch( err => d.reject(err) );
-
     return d.promise;
   };
-  const login = args => {
+  const retrieve = args => {
     const d = autobahn.when.defer();
-    const user = args[0];
-    _udm.user.login(user.username)
-      .then( user => d.resolve(user))
-      .catch( err => d.reject(err) );
-
-    return d.promise;
- 
-  };
-  const retrieve = args => {       
-    const d = autobahn.when.defer();
-    const userIdOrName = args[0];
-    _udm.user.retrieve(userIdOrName)
-      .then( user => d.resolve(user))
-      .catch( err => d.reject(err) );
-
+    //const featurectrlId = args[0];
+    repo.retrieveAll()
+      .then( res => {
+        d.resolve(res)
+      })
+      .catch( err => {
+        console.log(err);
+        d.reject(err) 
+      });
     return d.promise;
   };
   const update = args => {
     const d = autobahn.when.defer();
-    const user = [0]
-    _udm.user.update(user.id, user)
-      .then( user => d.resolve(user))
+    const featurectrl = [0]
+    repo.update(featurectrl.id, featurectrl)
+      .then( featurectrl => d.resolve(featurectrl))
       .catch( err => d.reject(err) );
-
     return d.promise;
   };
   const prefix = prefixes.api + '.' + prefixes.domain;
@@ -52,13 +44,11 @@ module.exports = (prefixes, session, autobahn, _udm) => new Promise((resolve, re
   const endpoints = [
     {name: 'create', cb: create},
     {name: 'remove', cb: remove},
-    {name: 'login', cb: login},
     {name: 'retrieve', cb: retrieve},
     {name: 'update', cb:update}
   ];
   const promises = endpoints.map(endpoint => {
     const fqn = prefix + '.' + endpoint.name;
-
     console.log(fqn);
     session.register(fqn, endpoint.cb)
   })
