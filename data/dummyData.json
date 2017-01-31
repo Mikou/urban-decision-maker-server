@@ -52,7 +52,7 @@
             "published": true,
             "author": 1,
             "visualization": {
-              "url": "http://www.w3schools.com"
+              "url": "https://www.w3schools.com"
             },
             "features": [
               { "componentType": "COMMENT_FORM" }
