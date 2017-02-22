@@ -17,15 +17,11 @@ const cn = process.env.DATABASE_URL;
 
 // pg-promise initialization options:
 const opts = {
+  promiseLib: promise,
   extend: obj => {
-    obj.bundle        = repos.bundle(obj, pgp);
-    obj.decisionspace = repos.decisionspace(obj, pgp);
-    obj.feature       = repos.feature(obj, pgp);
-    obj.user          = repos.user(obj, pgp);
-    obj.util          = repos.util(obj, pgp);
-    obj.visCtrl       = repos.visCtrl(obj, pgp);
-    obj.featurectrl   = repos.featurectrl(obj, pgp);
-    obj.visualization = repos.visualization(obj, pgp);
+      for (var r in repos) {
+         obj[r] = repos[r](obj, pgp);
+      }    
   }
 };
 // Load and initialize pg-promise:
