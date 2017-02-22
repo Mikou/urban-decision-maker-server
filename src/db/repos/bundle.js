@@ -9,15 +9,6 @@ module.exports = (rep, pgp) => {
         })
         .catch( err => reject(err) );
     }),
-    addFeature: (decisionspaceId, bundleId, featureCtrl) => new Promise( (resolve, reject) => {
-      rep.one(sql.bundle.addFeature, [bundleId, featureCtrl.componentType])
-        .then( res => {
-          resolve(res.id);
-        })
-        .catch( err => {
-          reject(err) 
-        });
-    }),
     remove: bundleId => rep.one(sql.bundle.remove, bundleId),
     retrieveAll: (decisionspaceId) => new Promise( (resolve, reject) => {
       rep.any(sql.bundle.retrieveAll, [decisionspaceId])

@@ -13,6 +13,13 @@
         "roles": ["domainexpert", "planner"]
       }
     ],
+    "featureContentTypes": [
+      {"type":"COMMENT"}
+    ],
+    "componentTypes": [
+      {"type":"COMMENT_FORM",    "input":null,      "output":"COMMENT"},
+      {"type":"COMMENT_ARCHIVE", "input":"COMMENT", "output":null}
+    ],
     "visctrls": [
       {
         "id": null,
@@ -52,12 +59,66 @@
             "published": true,
             "author": 1,
             "visualization": {
-              "url": "https://www.w3schools.com"
+              "url": "http://dummyvis.com/#3"
             },
             "features": [
-              { "componentType": "COMMENT_FORM" }
+              { 
+                "componentType": "COMMENT_FORM",
+                "contents": [
+                  {
+                    "topic":"test comment 1",
+                    "message": "this is my first comment",
+                    "author":1
+                  },
+                  {
+                    "topic":"test comment 2",
+                    "message": "this is my second comment",
+                    "author":1
+                  },
+                  {
+                    "topic":"test comment 1",
+                    "message": "this is my third comment",
+                    "author":1
+                  }
+                ]
+              },
+              { 
+                "componentType": "COMMENT_ARCHIVE",
+                "content": null
+              }
+            ]
+          },
+          {
+            "title": "my second bundle",
+            "description": "my second bundle",
+            "published": true,
+            "author": 1,
+            "visualization": {
+              "url": "http://dummyvis.com/#4"
+            },
+            "features": [
+              { 
+                "componentType": "COMMENT_FORM",
+                "contents": [
+                  {
+                    "topic":"test comment 1 on bundle 2",
+                    "message": "this is my first comment",
+                    "author":1
+                  },
+                  {
+                    "topic":"test comment 2 on bundle 2",
+                    "message": "this is my second comment",
+                    "author":1
+                  }
+                ]
+              },
+              { 
+                "componentType": "COMMENT_ARCHIVE",
+                "content": null
+              }
             ]
           }
+
         ]
       },
       {
@@ -75,11 +136,26 @@
             "visualization": {
               "url": "http://dummyvis.com/#1"
             },
-            "features": []
+            "features": [
+              { 
+                "componentType": "COMMENT_FORM",
+                "contents": [
+                  {
+                    "topic":"test comment",
+                    "message": "this comment",
+                    "author":1
+                  }
+                ]
+              },
+              { 
+                "componentType": "COMMENT_ARCHIVE",
+                "content": null
+              }
+            ]
+
           }
         ]
       }
-
     ]
   }
 }

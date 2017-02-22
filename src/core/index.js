@@ -18,6 +18,7 @@ const _udm = opts => {
 // loading all the modules
 const modules = {
   decisionspace: require('./decisionspace'),
+  feature:       require('./feature'),
   user:          require('./user'),
   util:          require('./util')
 };
@@ -26,6 +27,7 @@ const modules = {
 const opts = {
   extend: udm => {
     udm.decisionspace= modules.decisionspace(db, udm),
+    udm.feature=       modules.feature(db, udm),
     udm.user=          modules.user(db, udm),
     udm.util=          modules.util(db, udm)
   }

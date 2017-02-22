@@ -17,28 +17,51 @@ module.exports = (udm, data) => {
         }
       });
     };
+    const insertFeatureContents = (decisionspaceId, bundleId, contents) => {
+      return new Promise( (resolve, reject) => {
+        if(!contents || contents.length < 1) {
+          resolve();
+        } else {
+          const promises = contents.map( content =>
+            udm.decisionspace.withId(decisionspaceId)
+              .bundle.withId(bundleId)
+              .feature.addContent(content)
+          );
 
+          Promise.all(promises)
+            .then( () => resolve() )
+            .catch( err => reject(err) );
+        }
+      });
+    }
     const insertFeatures = (decisionspaceId, bundleId, features) => {
       return new Promise( (resolve, reject) => {
         if (!features || features.length < 1) {
           resolve();
         } else {
           const promises = features.map(
-            featurectrl => {
+            feature => {
               return udm.decisionspace.withId(decisionspaceId)
                  .bundle.withId(bundleId)
-                 .addFeature(featurectrl)
+                 .feature.add(feature)
             }
           );
           Promise.all(promises)
-            .then( data => {
-              resolve() 
+            .then( features => {
+
+              const promises = features.map(feature => {
+                return insertFeatureContents(decisionspaceId, bundleId, feature.contents);
+              });
+
+              Promise.all(promises)
+                .then( () => resolve() )
+                .catch( err => reject(err) );
+
             })
             .catch( err => reject(err) );
         }
       });
     }
-
     const insertBundles = (decisionspaceId, bundles) => {
       return new Promise( (resolve, reject) => {
         if (!bundles || bundles.length < 1) {
@@ -104,12 +127,42 @@ module.exports = (udm, data) => {
         }
       });
     };
+    const insertComponentTypes = componentTypes => {
+      return new Promise( (resolve, reject) => {
+        if(!componentTypes || componentTypes < 1) {
+          resolve();
+        } else {
+          const promises = componentTypes.map( componentType => 
+              udm.feature.addComponentType(componentType));
+          Promise.all(promises)
+            .then(() => resolve())
+            .catch( err => reject(err) );
+        }
+      });
+    }
+
+    const insertFeatureContentTypes = featureContentTypes => {
+      return new Promise( (resolve, reject) => {
+        if(!featureContentTypes || featureContentTypes < 1) {
+          resolve();
+        } else {
+          const promises = featureContentTypes.map( featureContentType => 
+              udm.feature.addFeatureContentType(featureContentType));
+          Promise.all(promises)
+            .then(() => resolve())
+            .catch( err => reject(err) );
+        }
+      });
+    }
+
       insertUdm(data.udm)
-      .then( () => insertUsers(data.udm.users) )
-      .then( () => insertDecisionspaces(data.udm.decisionspaces) )
-      .then( () => insertVisctrls(data.udm.visctrls) )
-      .then( () => insertFeaturectrls(data.udm.featurectrls) )
-      .then( () => resolve() )
+        .then( () => insertFeatureContentTypes(data.udm.featureContentTypes) )
+        .then( () => insertComponentTypes(data.udm.componentTypes) )
+        .then( () => insertUsers(data.udm.users) )
+        .then( () => insertDecisionspaces(data.udm.decisionspaces) )
+        .then( () => insertVisctrls(data.udm.visctrls) )
+        .then( () => insertFeaturectrls(data.udm.featurectrls) )
+        .then( () => resolve() )
       .catch( err => reject(err))
 
   });

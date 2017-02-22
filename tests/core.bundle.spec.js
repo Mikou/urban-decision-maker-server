@@ -12,12 +12,12 @@ describe('udm.bundle', () => {
     .catch( err => console.log(err));
   });
   it('should add 2 features in a bundle', done => {
-    udm.decisionspace.withId(2).bundle.withId(1).addFeature({
+    udm.decisionspace.withId(2).bundle.withId(1).feature.add({
       componentType: 'COMMENT_FORM'
     })
     .then( featureId => {
       expect(featureId).to.be.a("number");
-      return udm.decisionspace.withId(2).bundle.withId(1).addFeature({
+      return udm.decisionspace.withId(2).bundle.withId(1).feature.add({
         componentType: 'COMMENT_ARCHIVE'
       })
     })

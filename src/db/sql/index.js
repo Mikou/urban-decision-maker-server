@@ -39,36 +39,40 @@ module.exports = {
   },
   bundle: {
     addWithVisualization: open('bundle/addWithVisualization.sql'),
-    addFeature: open('bundle/addFeature.sql'),
-    remove:   open('bundle/delete.sql'),
+    remove:      open('bundle/delete.sql'),
     retrieveAll: open('bundle/retrieveAll.sql'),
-    update:   open('bundle/update.sql')
+    update:      open('bundle/update.sql')
   },
   decisionspace: {
-    add:      open('decisionspace/add.sql'),
-    canAccess:open('decisionspace/canAccess.sql'),
-    grant:    open('decisionspace/grant.sql'),
-    isPublic: open('decisionspace/isPublic.sql'),
-    remove:   open('decisionspace/delete.sql'),
-    retrieve: open('decisionspace/retrieve.sql'),
-    retrieveAll: open('decisionspace/retrieveAll.sql'),
+    add:          open('decisionspace/add.sql'),
+    canAccess:    open('decisionspace/canAccess.sql'),
+    grant:        open('decisionspace/grant.sql'),
+    isPublic:     open('decisionspace/isPublic.sql'),
+    remove:       open('decisionspace/delete.sql'),
+    retrieve:     open('decisionspace/retrieve.sql'),
+    retrieveAll:  open('decisionspace/retrieveAll.sql'),
     retrievefull: open('decisionspace/retrievefull.sql'),
-    revoke:   open('decisionspace/revoke.sql'),
-    update:   open('decisionspace/update.sql')
+    revoke:       open('decisionspace/revoke.sql'),
+    update:       open('decisionspace/update.sql')
   },
   feature: {
-    add:      open('feature/add.sql'),
-    remove:   open('feature/delete.sql'),
-    retrieve: open('feature/retrieve.sql'),
-    update:   open('feature/update.sql')
+    addFeatureContentType: open('feature/addFeatureContentType.sql'),
+    addComponentType:      open('feature/addComponentType.sql'),
+    addFeatureContent:     open('feature/addFeatureContent.sql'),
+    addFeature:            open('feature/addFeature.sql'),
+    add:                   open('feature/add.sql'),
+    remove:                open('feature/delete.sql'),
+    retrieve:              open('feature/retrieve.sql'),
+    retrieveContent:       open('feature/retrieveContent.sql'),
+    update:                open('feature/update.sql')
   },
   user: {
-    add:      open('user/add.sql'),
-    remove:   open('user/delete.sql'),
-    retrieveById: open('user/retrieveById.sql'),
-    retrieveByUsername: open('user/retrieveByUsername.sql'),
+    add:                      open('user/add.sql'),
+    remove:                   open('user/delete.sql'),
+    retrieveById:             open('user/retrieveById.sql'),
+    retrieveByUsername:       open('user/retrieveByUsername.sql'),
     retrieveByUsernamePrefix: open('user/retrieveByUsernamePrefix.sql'),
-    update:   open('user/update.sql')
+    update:                   open('user/update.sql')
   },
   visualization: {
     add:      open('visualization/add.sql'),
@@ -77,16 +81,16 @@ module.exports = {
     update:   open('visualization/update.sql')
   },
   visCtrl: {
-    add:      open('visCtrl/add.sql'),
-    remove:   open('visCtrl/delete.sql'),
+    add:         open('visCtrl/add.sql'),
+    remove:      open('visCtrl/delete.sql'),
     retrieveAll: open('visCtrl/retrieveAll.sql'),
-    update:   open('visCtrl/update.sql')
+    update:      open('visCtrl/update.sql')
   },
   featurectrl: {
-    add:      open('featurectrl/add.sql'),
-    remove:   open('featurectrl/delete.sql'),
+    add:         open('featurectrl/add.sql'),
+    remove:      open('featurectrl/delete.sql'),
     retrieveAll: open('featurectrl/retrieveAll.sql'),
-    update:   open('featurectrl/update.sql')
+    update:      open('featurectrl/update.sql')
   }
 
 }

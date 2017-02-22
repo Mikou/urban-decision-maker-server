@@ -11,14 +11,18 @@ DROP TABLE IF EXISTS udm_featurectrl_user;
 DROP TABLE IF EXISTS udm_decisionspace_bundle;
 DROP TABLE IF EXISTS udm_bundle_user;
 -- simple tables:
-DROP TABLE IF EXISTS udm_user;
 DROP TABLE IF EXISTS udm_visctrl;
 DROP TABLE IF EXISTS udm_featurectrl;
 DROP TABLE IF EXISTS udm_feature;
+DROP TABLE IF EXISTS udm_componenttype;
+DROP TABLE IF EXISTS udm_featurecontent;
+DROP TABLE IF EXISTS udm_featurecontenttype;
+
 DROP TABLE IF EXISTS udm_visualization;
 DROP TABLE IF EXISTS udm_bundle;
 DROP TABLE IF EXISTS udm_decisionspace;
 DROP TABLE IF EXISTS udm_comment;
+DROP TABLE IF EXISTS udm_user;
 -- CREATE NEW SCHEMA
 CREATE TABLE udm_user (
   id SERIAL    PRIMARY KEY,
@@ -78,6 +82,16 @@ CREATE TABLE udm_visualization (
   UNIQUE(bundle_id),
   FOREIGN KEY (bundle_id) REFERENCES udm_bundle(id)
 );
+CREATE TABLE udm_featurecontenttype(
+  name varchar(32) PRIMARY KEY
+);
+CREATE TABLE udm_componenttype(
+  name        varchar(32) PRIMARY KEY,
+  output_type varchar(32),
+  input_type  varchar(32),
+  FOREIGN KEY (output_type) REFERENCES udm_featurecontenttype(name),
+  FOREIGN KEY (input_type)  REFERENCES udm_featurecontenttype(name)
+);
 CREATE TABLE udm_feature (
   id SERIAL    PRIMARY KEY,
   decisionspace_id  integer,
@@ -87,7 +101,21 @@ CREATE TABLE udm_feature (
   component_type    varchar (32)  NOT NULL,
   gravity           integer       NOT NULL,
   --FOREIGN KEY       (decisionspace_id) REFERENCES udm_decisionspace(id),
-  FOREIGN KEY       (bundle_id)    REFERENCES udm_bundle(id)
+  FOREIGN KEY       (component_type) REFERENCES udm_componenttype(name),
+  FOREIGN KEY       (bundle_id)      REFERENCES udm_bundle(id)
+);
+CREATE TABLE udm_featurecontent (
+  id SERIAL    PRIMARY KEY,
+  content_type     varchar(32),
+  decisionspace_id integer,
+  bundle_id        integer,
+  author_id        integer,
+  data             json,
+  created_date     timestamp     NOT NULL DEFAULT now(),
+  FOREIGN KEY      (decisionspace_id) REFERENCES udm_decisionspace(id),
+  FOREIGN KEY      (bundle_id)        REFERENCES udm_bundle(id),
+  FOREIGN KEY      (author_id)        REFERENCES udm_user(id),
+  FOREIGN KEY      (content_type)     REFERENCES udm_featurecontenttype(name)
 );
 CREATE TABLE udm_comment (
   id SERIAL    PRIMARY KEY,

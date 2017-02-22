@@ -8,10 +8,11 @@ module.exports = opts => {
   });
 
   const domains = [
-    {name: 'user', fn: require('./user')},
-    {name: 'bundle', fn: require('./bundle')},
-    {name: 'visctrl', fn: require('./visctrl')},
-    {name: 'featurectrl', fn: require('./featurectrl')},
+    {name: 'user',          fn: require('./user')},
+    {name: 'bundle',        fn: require('./bundle')},
+    {name: 'visctrl',       fn: require('./visctrl')},
+    {name: 'feature',       fn: require('./feature')},
+    {name: 'featurectrl',   fn: require('./featurectrl')},
     {name: 'decisionspace', fn: require('./decisionspace')}
   ];
 

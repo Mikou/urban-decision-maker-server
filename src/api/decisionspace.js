@@ -72,7 +72,7 @@ module.exports = (prefixes, session, autobahn, _udm) => new Promise((resolve, re
   ];
   const promises = endpoints.map(endpoint => {
     const fqn = prefix + '.' + endpoint.name;
-    console.log(fqn);
+    //console.log(fqn);
     session.register(fqn, endpoint.cb)
   })
   Promise.all(promises)

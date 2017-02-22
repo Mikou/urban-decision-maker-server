@@ -1,9 +1,9 @@
 module.exports = (_db, _udm) => {
   const services = {
-    feature: require('./feature'),
-    featurectrl: require('./featurectrl'),
-    bundle: require('./bundle'),
-    visctrl: require('./visctrl'),
+    feature:       require('./feature'),
+    featurectrl:   require('./featurectrl'),
+    bundle:        require('./bundle'),
+    visctrl:       require('./visctrl'),
     visualization: require('./visualization')
   };
   //const feature = services.feature(_db, _udm, decisionspace, decisionspaceId),
@@ -22,7 +22,15 @@ module.exports = (_db, _udm) => {
         grant: userId => repo.grant(userId, decisionspaceId),
         remove: () => repo.remove(decisionspaceId),
         retrieve: () => repo.retrieve(decisionspaceId),
-        retrievefull: () => repo.retrievefull(decisionspaceId),
+        retrievefull: () => new Promise( (resolve, reject) => {
+          
+          repo.retrievefull(decisionspaceId)
+          .then( res => {
+            resolve(res);
+          })
+          .catch( err => console.log(err) );
+
+        }),
         revoke: userId => repo.revoke(userId, decisionspaceId),
         update: decisionspace => {
           if(decisionspace.id != decisionspaceId)

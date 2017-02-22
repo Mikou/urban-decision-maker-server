@@ -6,8 +6,6 @@ module.exports = (_db, _udm) => {
     visctrl: require('./visctrl'),
     visualization: require('./visualization')
   };
-  //const feature = services.feature(_db, _udm, decisionspace, decisionspaceId),
-
   const repo = _db.decisionspace;
   const decisionspace = {
     create: decisionspace => repo.add(decisionspace),
