@@ -1,6 +1,6 @@
 WITH inserted_bundle AS (
   INSERT INTO ${prefix#}_bundle (_type, title, description, published, gravity, decisionspace_id)
-         VALUES ('visualization', $1, $2, $3, 0, $4)
+         VALUES ('visualization', $1, $2, $3, (SELECT COUNT(*) FROM udm_bundle), $4)
          RETURNING id
 ), inserted_bundle_user AS (
   INSERT INTO ${prefix#}_bundle_user (user_id, bundle_id)

@@ -64,6 +64,7 @@ module.exports = {
     remove:                open('feature/delete.sql'),
     retrieve:              open('feature/retrieve.sql'),
     retrieveContent:       open('feature/retrieveContent.sql'),
+    removeFeature:         open('feature/removeFeature.sql'),
     update:                open('feature/update.sql')
   },
   user: {

@@ -40,10 +40,10 @@ module.exports = (udm, data) => {
           resolve();
         } else {
           const promises = features.map(
-            feature => {
+            (feature, index) => {
               return udm.decisionspace.withId(decisionspaceId)
                  .bundle.withId(bundleId)
-                 .feature.add(feature)
+                 .feature.add(feature, index)
             }
           );
           Promise.all(promises)

@@ -7,4 +7,4 @@ SELECT
   created_date as "createDate", 
   data 
 FROM udm_featurecontent 
-WHERE decisionspace_id=1 AND bundle_id=1
+WHERE decisionspace_id=$1 AND bundle_id=$2

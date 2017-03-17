@@ -14,7 +14,7 @@ SELECT
 
         -- find features ----------------------------------------------------------------------
           (WITH feature AS (
-            SELECT id, component_type, bundle_id, (
+            SELECT id, component_type, gravity, bundle_id, (
               SELECT input_type 
               FROM udm_componenttype 
               WHERE 
@@ -27,7 +27,7 @@ SELECT
           ) 
           SELECT array_agg(row_to_json(f)) 
           FROM (
-            SELECT id, component_type AS "componentType", (
+            SELECT id, component_type AS "componentType", gravity, (
               -- find feature content ---------------------------------------------------------
               SELECT array_agg(row_to_json(t2)) FROM (
                 (SELECT id, bundle_id, content_type, data 
@@ -37,7 +37,7 @@ SELECT
               ) t2
               -- // find feature content ------------------------------------------------------
             ) AS payload
-              FROM feature
+              FROM feature ORDER BY gravity ASC
           ) f ) 
         AS features
         -- // find features -------------------------------------------------------------------

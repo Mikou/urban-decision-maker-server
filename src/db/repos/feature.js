@@ -1,25 +1,10 @@
 const sql = require('../sql').feature;
 module.exports = (rep, pgp) => {
   return {
-    /*add: (decisionspaceId, bundleId, featureContentType, content) => new Promise( (resolve, reject) => {
-      switch(featureContentType) {
-        case "commentform" :
-          rep.one(sql.addFeatureContent, [decisionspaceId, bundleId, featureContentType, content.author, content])
-          .then( res => {
-            content.id = res.id,
-            resolve(content);
-          })
-          .catch(err => {
-            console.log(err);
-            reject(err) ;
-          })
-          break;
-      }
-
-    }),*/
-    add: (decisionspaceId, bundleId, feature) => new Promise( (resolve, reject) => {
-      rep.one(sql.addFeature, [bundleId, feature.componentType])
+    add: (decisionspaceId, bundleId, featureCtrl, gravity) => new Promise( (resolve, reject) => {
+      rep.one(sql.addFeature, [bundleId, featureCtrl.componentType, gravity])
         .then( res => {
+          const feature = featureCtrl;
           feature.id = res.id;
           resolve(feature);
         })
@@ -55,6 +40,15 @@ module.exports = (rep, pgp) => {
         .catch( err => {
           reject(err);
         });
+    }),
+    removeFeature: (featureId) => new Promise((resolve, reject) => {
+      rep.any(sql.removeFeature, [featureId])
+        .then( res => {
+          resolve(res);
+        })
+        .catch( err => {
+          reject(err);
+        })
     }),
     addComponentType: (componentType, input, output) => new Promise( (resolve, reject) => {
       rep.one(sql.addComponentType, [componentType.type, componentType.input, componentType.output])

@@ -22,11 +22,12 @@ module.exports = (prefixes, session, autobahn, _udm) => new Promise((resolve, re
     const decisionspaceId = args[0];
     const bundleId = args[1];
     const featureCtrl = args[2];
+    const gravity = args[3];
     const repo = _udm.decisionspace
                      .withId(decisionspaceId)
                      .bundle
                      .withId(bundleId);
-    repo.feature.add(featureCtrl)
+    repo.feature.add(featureCtrl, gravity)
       .then( res => {
         d.resolve(res);
       })

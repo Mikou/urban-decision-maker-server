@@ -5,19 +5,32 @@ module.exports = (prefixes, session, autobahn, _udm) => new Promise( (resolve, r
     const bundleId = args[1];
     const contentType = args[2];
     //console.log(decisionspaceId, bundleId, contentType);
-    /*try {
-    const repo = udm.decisionspace.withId(decisionspaceId)
+    /*try {*/
+
+    const repo = _udm.decisionspace.withId(decisionspaceId)
                     .bundle.withId(bundleId).feature
 
-    /*repo.retieveContent(contentType)
-    } catch(err) {
-      console.log(err);
-    }
+    repo.retrieveContent(contentType)
     .then( res => d.resolve(res))
     .catch( err => {
       console.log(err);
       d.reject(err)
-    });1*/
+    });
+    return d.promise;
+  }
+  const removefeature = args => {
+    const d = autobahn.when.defer();
+
+    const decisionspaceId = args[0];
+    const bundleId = args[1];
+    const featureId = args[2];
+    const repo = _udm.decisionspace.withId(decisionspaceId)
+                    .bundle.withId(bundleId).feature
+    repo.removeFeature(featureId)
+    .then( res => d.resolve(res))
+    .catch( err => {
+      d.reject(err)
+    });
     return d.promise;
   }
   const prefix = prefixes.api + '.' + prefixes.domain;
@@ -25,7 +38,8 @@ module.exports = (prefixes, session, autobahn, _udm) => new Promise( (resolve, r
   console.log("registering methods for " + prefix);
   console.log("---------------------------------------------------");
   const endpoints = [
-    {name: 'retrievecontent', cb: retrievecontent}
+    {name: 'retrievecontent', cb: retrievecontent},
+    {name: 'removefeature', cb: removefeature}
   ];
   const promises = endpoints.map(endpoint => {
     const fqn = prefix + '.' + endpoint.name;
