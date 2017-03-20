@@ -56,7 +56,9 @@ module.exports = (prefixes, session, autobahn, _udm) => new Promise((resolve, re
     const decisionspace = args[1];
     repo.withId(decisionspace.id).update(decisionspace)
       .then( decisionspace => d.resolve(decisionspace))
-      .catch( err => d.reject(err) );
+      .catch( err => {
+        console.log(err);
+        d.reject(err) });
     return d.promise;
   };
   const prefix = prefixes.api + '.' + prefixes.domain;
